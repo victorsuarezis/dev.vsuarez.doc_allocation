@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Doc_Allocation
+Bundle-SymbolicName: dev.vsuarez.doc_allocation;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: dev.vsuarez.doc.allocation
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-Vendor: Ing. Victor Suarez
+Require-Bundle: org.adempiere.base;bundle-version="7.1.0",
+ org.adempiere.plugin.utils;bundle-version="7.1.0"
+Bundle-Activator: org.adempiere.plugin.utils.Incremental2PackActivator
+Service-Component: OSGI-INF/DocFactory.xml
+Bundle-ActivationPolicy: lazy
