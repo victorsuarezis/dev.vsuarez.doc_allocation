@@ -1060,6 +1060,8 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 					fl.setLine_ID(C_AllocationLine_ID == null ? 0 : C_AllocationLine_ID);
 				}
 			}
+			System.out.println("createInvoiceRoundingCorrection - Diferencia = " + acctDifference);
+			s_log.log(Level.WARNING, "createInvoiceRoundingCorrection - Diferencia = " + acctDifference);
 		}
 		return null;				
 	}	//	createInvoiceRounding
@@ -1120,6 +1122,7 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 	private String createInvoiceGainLoss (DocLine line, MAcctSchema as, Fact fact, MAccount acct,
 		MInvoice invoice, BigDecimal allocationSource, BigDecimal allocationAccounted)
 	{
+		System.out.println("createInvoiceGainLoss - Create Realized Gain & Loss.");
 		BigDecimal invoiceSource = null;
 		BigDecimal invoiceAccounted = null;
 		//
@@ -1229,6 +1232,7 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 			fl.setDescription(description.toString());
 			invGainLossFactLines.add(fl);
 		}
+		System.out.println("createInvoiceGainLoss - Difference: " + acctDifference);
 		return null;
 	}
 
@@ -1249,6 +1253,7 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 	private String createPaymentGainLoss (DocLine line, MAcctSchema as, Fact fact, MAccount acct,
 		MPayment payment, BigDecimal allocationSource, BigDecimal allocationAccounted)
 	{
+		System.out.println("createPaymentGainLoss - Create Realized Gain & Loss.");
 		BigDecimal paymentSource = null;
 		BigDecimal paymentAccounted = null;
 		//
@@ -1282,12 +1287,15 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 		
 		BigDecimal acctDifference = null;	//	gain is negative
 		//	Full Payment in currency
+		s_log.log(Level.WARNING, "Comprobando diferencias entre Allocation Source y Payment Source: " + allocationSource.abs() + " - " + paymentSource.abs());
 		if (allocationSource.abs().compareTo(paymentSource.abs()) == 0)
 		{
 			acctDifference = allocationAccounted.abs().subtract(paymentAccounted.abs());	//	gain is negative
 			StringBuilder d2 = new StringBuilder("(full) = ").append(acctDifference);
 			if (log.isLoggable(Level.FINE)) log.fine(d2.toString());
 			description.append(" - ").append(d2);
+			s_log.log(Level.WARNING, "Diferencia: " + acctDifference);
+			System.out.println("Diferencia: " + acctDifference);
 		}
 		else
 		{
@@ -1296,6 +1304,10 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 					as.getC_Currency_ID(), payment.getDateAcct(),
 					payment.getC_ConversionType_ID(), payment.getAD_Client_ID(), payment.getAD_Org_ID());
 			acctDifference = allocationAccounted.abs().subtract(allocationAccounted0.abs());
+			s_log.log(Level.WARNING, "Conversion, allocationAccounted = " + allocationAccounted + ", allocationAccounted0 = " + allocationAccounted0 + 
+					"Diferencia = " + acctDifference);
+			System.out.println("Conversion, allocationAccounted = " + allocationAccounted + ", allocationAccounted0 = " + allocationAccounted0 + 
+					"Diferencia = " + acctDifference);
 			//	ignore Tolerance
 			if (acctDifference.abs().compareTo(TOLERANCE) < 0)
 				acctDifference = Env.ZERO;
@@ -1333,6 +1345,7 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 			fl.setDescription(description.toString());
 			payGainLossFactLines.add(fl);
 		}
+		System.out.println("createPaymentGainLoss - Difference: " + acctDifference);
 		return null;
 	}
 
@@ -1665,6 +1678,8 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 					fl.setLine_ID(C_AllocationLine_ID == null ? 0 : C_AllocationLine_ID);
 				}
 			}
+			System.out.println("createPaymentRoundingCorrection - Diferencia = " + acctDifference);
+			s_log.log(Level.WARNING, "createPaymentRoundingCorrection - Diferencia = " + acctDifference);
 		}
 		return null;
 	}
@@ -1734,6 +1749,9 @@ class Doc_AllocationTaxVS
 	 */
 	public boolean createEntries (MAcctSchema as, Fact fact, DocLine line)
 	{
+		System.out.println("Create Tax Accounting Entries, Allocation Currency: " + line.getC_Currency_ID()
+		+ ", Fact Currency: " + fact);
+		
 		//	get total index (the Receivables/Liabilities line)
 		BigDecimal total = Env.ZERO;
 		for (int i = 0; i < m_facts.size(); i++)
@@ -1787,15 +1805,15 @@ class Doc_AllocationTaxVS
 						//for sales actions
 						if (m_IsSOTrx) {
 							fact.createLine (line, m_DiscountAccount,
-								as.getC_Currency_ID(), amount, null);
+								line.getC_Currency_ID(), amount, null);
 							fact.createLine (line, taxAcct,
-								as.getC_Currency_ID(), null, amount);
+								line.getC_Currency_ID(), null, amount);
 						} else {
 						//for purchase actions
 							fact.createLine (line, m_DiscountAccount,
-								as.getC_Currency_ID(), amount.negate(), null);
+								line.getC_Currency_ID(), amount.negate(), null);
 							fact.createLine (line, taxAcct,
-								as.getC_Currency_ID(), null, amount.negate());
+								line.getC_Currency_ID(), null, amount.negate());
 						}
 
 					}
@@ -1810,14 +1828,14 @@ class Doc_AllocationTaxVS
 //						for sales actions
 						if (m_IsSOTrx) {
 							fact.createLine (line, taxAcct,
-								as.getC_Currency_ID(), amount, null);
+								line.getC_Currency_ID(), amount, null);
 							fact.createLine (line, m_DiscountAccount,
-								as.getC_Currency_ID(), null, amount);
+								line.getC_Currency_ID(), null, amount);
 						} else {
 							fact.createLine (line, taxAcct,
-								as.getC_Currency_ID(), amount.negate(), null);
+								line.getC_Currency_ID(), amount.negate(), null);
 							fact.createLine (line, m_DiscountAccount,
-								as.getC_Currency_ID(), null, amount.negate());
+								line.getC_Currency_ID(), null, amount.negate());
 						}
 					}
 				}
@@ -1835,15 +1853,16 @@ class Doc_AllocationTaxVS
 					{
 						if (m_IsSOTrx) {
 							fact.createLine (line, m_WriteOffAccount,
-									as.getC_Currency_ID(), amount, null);
+									line.getC_Currency_ID(), amount, null);
 							fact.createLine (line, taxAcct,
-									as.getC_Currency_ID(), null, amount);
+									line.getC_Currency_ID(), null, amount);
 						} else {
 							fact.createLine (line, m_WriteOffAccount,
-									as.getC_Currency_ID(), amount.negate(), null);
+									line.getC_Currency_ID(), amount.negate(), null);
 							fact.createLine (line, taxAcct,
-									as.getC_Currency_ID(), null, amount.negate());
+									line.getC_Currency_ID(), null, amount.negate());
 						}
+						System.out.println("Create Tax Entries - Original Tax is DR - need to correct it CR: " + amount);
 					}
 				}
 				//	Original Tax is CR - need to correct it DR
@@ -1855,15 +1874,16 @@ class Doc_AllocationTaxVS
 					{
 						if(m_IsSOTrx) {
 							fact.createLine (line, taxAcct,
-									as.getC_Currency_ID(), amount, null);
+									line.getC_Currency_ID(), amount, null);
 							fact.createLine (line, m_WriteOffAccount,
-									as.getC_Currency_ID(), null, amount);
+									line.getC_Currency_ID(), null, amount);
 						} else {
 							fact.createLine (line, taxAcct,
-									as.getC_Currency_ID(), amount.negate(), null);
+									line.getC_Currency_ID(), amount.negate(), null);
 							fact.createLine (line, m_WriteOffAccount,
-									as.getC_Currency_ID(), null, amount.negate());
+									line.getC_Currency_ID(), null, amount.negate());
 						}
+						System.out.println("Create Tax Entries - Original Tax is CR - need to correct it DR: " + amount);
 					}
 				}
 			}	//	WriteOff
@@ -1892,7 +1912,7 @@ class Doc_AllocationTaxVS
 		BigDecimal retValue = multiplier.multiply(amt);
 		if (retValue.scale() > precision)
 			retValue = retValue.setScale(precision, RoundingMode.HALF_UP);
-		if (log.isLoggable(Level.FINE)) log.fine(retValue + " (Mult=" + multiplier + "(Prec=" + precision + ")");
+		if (log.isLoggable(Level.FINE)) log.fine(retValue + " (Mult=" + multiplier + "(Prec=" + precision + ")");		
 		return retValue;
 	}	//	calcAmount
 
