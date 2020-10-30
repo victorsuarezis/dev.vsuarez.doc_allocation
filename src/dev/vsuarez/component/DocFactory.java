@@ -66,6 +66,9 @@ public class DocFactory implements IDocFactory {
 
 	@Override
 	public Doc getDocument(MAcctSchema as, int AD_Table_ID, ResultSet rs, String trxName) {
+		String tableName = MTable.getTableName(Env.getCtx(), AD_Table_ID);
+		if (!tableName.equals(I_C_AllocationHdr.Table_Name))
+			return null;
 		Doc doc = null;
 		String className = Doc_AllocationHdrVS.class.getCanonicalName();
 		try
