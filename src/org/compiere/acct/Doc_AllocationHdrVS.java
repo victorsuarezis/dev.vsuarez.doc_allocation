@@ -161,12 +161,31 @@ public class Doc_AllocationHdrVS extends Doc_AllocationHdr
 			FactLine fl = null;
 			FactLine flForRGL = null;
 			//
+			MAllocationLine alLine = new MAllocationLine(getCtx(), line.get_ID(), getTrxName());
+			MAllocationHdr hdr = (MAllocationHdr) alLine.getC_AllocationHdr();
+			if(line.getC_Order_ID() > 0) {
+				MOrder order = new MOrder(getCtx(), line.getC_Order_ID(), getTrxName());
+				if(line.getC_ConversionType_ID() <= 0)
+					line.setC_ConversionType_ID(order.getC_ConversionType_ID());
+				if(hdr.get_ValueAsInt("C_ConversionType_ID") <= 0)
+					hdr.set_ValueOfColumn("C_ConversionType_ID", order.getC_ConversionType_ID());
+			}
 			MPayment payment = null;
-			if (line.getC_Payment_ID() != 0)
+			if (line.getC_Payment_ID() != 0) {
 				payment = new MPayment (getCtx(), line.getC_Payment_ID(), getTrxName());
+				if(line.getC_ConversionType_ID() <= 0)
+					line.setC_ConversionType_ID(payment.getC_ConversionType_ID());
+				if(hdr.get_ValueAsInt("C_ConversionType_ID") <= 0)
+					hdr.set_ValueOfColumn("C_ConversionType_ID", payment.getC_ConversionType_ID());
+			}
 			MInvoice invoice = null;
-			if (line.getC_Invoice_ID() != 0)
+			if (line.getC_Invoice_ID() != 0) {
 				invoice = new MInvoice (getCtx(), line.getC_Invoice_ID(), getTrxName());
+				if(line.getC_ConversionType_ID() <= 0)
+					line.setC_ConversionType_ID(invoice.getC_ConversionType_ID());
+				if(hdr.get_ValueAsInt("C_ConversionType_ID") <= 0)
+					hdr.set_ValueOfColumn("C_ConversionType_ID", invoice.getC_ConversionType_ID());
+			}
 			
 			BigDecimal allocPayAccounted = Env.ZERO;
 			BigDecimal allocPaySource = Env.ZERO;

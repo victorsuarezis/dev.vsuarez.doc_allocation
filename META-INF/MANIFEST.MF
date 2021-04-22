@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Doc_Allocation
 Bundle-SymbolicName: dev.vsuarez.doc_allocation;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Automatic-Module-Name: dev.vsuarez.doc.allocation
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: Ing. Victor Suarez
